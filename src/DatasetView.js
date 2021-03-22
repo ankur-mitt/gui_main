@@ -5,9 +5,9 @@ import {
     ButtonGroup,
     Slider,
     Grid,
-    Input,
+    // Input,
     InputLabel,
-    InputAdornment,
+    // InputAdornment,
     FormControl,
     Select,
     MenuItem,
@@ -20,11 +20,11 @@ import {AddPhotoAlternateSharp, VisibilitySharp, CloudUploadSharp} from "@materi
 import {io} from "socket.io-client";
 import {backendURL} from "./backendConfig";
 //  function_number is the number of functions or operations that we can apply on the image, like noise, rotate, translate, zoom etc.
-let function_number = 4
-let probability_array = new Array(function_number).fill(0)
-let value_array = new Array(function_number).fill(0)
-// Starting Main Socket conncetion it will be restarted if it is disconnected and it is needed
-let main_socket = io(backendURL)
+let function_number = 4;
+let probability_array = new Array(function_number).fill(0);
+let value_array = new Array(function_number).fill(0);
+// Starting Main Socket connection it will be restarted if it is disconnected and it is needed
+let main_socket = io(backendURL);
 async function handleOpenAndReadFiles() {
     // get files from user
     const blobs = await fileOpen({
@@ -69,14 +69,12 @@ function handleSelectFiles(setTileData) {
 function handlePreviewImages(tileData) {
     // manipulation_data is a dictionary as follows
     //  for 1st manipulation data we have these
-    //  param_1 : includes value of parameter in the appropiate range, also parameter can be anything even an list
+    //  param_1 : includes value of parameter in the appropriate range, also parameter can be anything even an list
     //  prob_1 : is the probability of images on which param 1 is applied
     //  if parameter is not applied then that parameter should be marked 0 both param_i and prob_i
     // refer functions to get idea about range of these functions
     // 0 : add_noise | 1: rotate_image | 2: translate | 3: zoom
-            let manipulation_prob = probability_array
-            let manipulation_val = value_array
-            console.log("about to send data")
+            console.log("about to send data");
             let manipulation_data = {
                 "param_0": value_array[0],
                 "prob_0": probability_array[0],
@@ -86,18 +84,15 @@ function handlePreviewImages(tileData) {
                 "prob_2": probability_array[2],
                 "param_3": value_array[3],
                 "prob_3": probability_array[3],
-            }
+            };
             if (!main_socket.connected) {
-                main_socket.connect()
+                main_socket.connect();
             }
             if (main_socket.connected) {
-                console.log("ready to send")
-                main_socket.emit("apply_operations", {"images":tileData,
-                                            "operations": manipulation_data,
-                                            });
-            
+                console.log("ready to send");
+                main_socket.emit("apply_operations", {"images":tileData, "operations": manipulation_data});
             }
-            console.log("data sent")
+            console.log("data sent");
 }
 
 function ManipulationInputOptions() {
