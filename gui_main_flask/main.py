@@ -50,13 +50,13 @@ def images_received(apply_operations_data):
     processed_data = []
     for single_image_data in images_data:
         #add unprocessed image to processed data list
-        processed_data.append(single_image_data)       
+        # processed_data.append(single_image_data)       
         # convert str to array
         head64data, body64data = single_image_data["src"].split(',')
         image = Image.open(BytesIO(base64.b64decode(body64data)))
         image = image.convert("RGB")
         img = np.array(image)
-        origin_img = rotate_image(image =img, factor=0)
+        # origin_img = rotate_image(image =img, factor=0)
         img = rotate_image(image =img, factor=0)
         modified = False
         
@@ -71,15 +71,15 @@ def images_received(apply_operations_data):
 
         # convert array to pil image
         pil_img = Image.fromarray((img * 255).astype(np.uint8))
-        origin_pil = Image.fromarray((origin_img * 255).astype(np.uint8))
+        # origin_pil = Image.fromarray((origin_img * 255).astype(np.uint8))
 
         # save pil image in computer
         base_path = str(Path(__file__).parent.parent)+"\\archive\\Temp\\"
         if modified:
             pil_img.save("..\\archive\\Temp\\01\\01_"+str(count)+".png", "png")
             count += 1   
-        origin_pil.save("..\\archive\\Temp\\01\\01_"+str(count)+".png", "png")
-        count += 1
+        # origin_pil.save("..\\archive\\Temp\\01\\01_"+str(count)+".png", "png")
+        # count += 1
 
         #convert pil image to binary data
         buff = BytesIO()
@@ -87,9 +87,9 @@ def images_received(apply_operations_data):
         head64data = "data:image/png;base64,"
         body64data = base64.b64encode(buff.getvalue()).decode("utf-8")
         # update new image data
-        if modified:
-            single_image_data["src"] = head64data + body64data
-            processed_data.append(single_image_data)
+        # if modified:
+        single_image_data["src"] = head64data + body64data
+        processed_data.append(single_image_data)
         print("images processed no. of imgs "+str(len(processed_data)))
 
     # send processed data
