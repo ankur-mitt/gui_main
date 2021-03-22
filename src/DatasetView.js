@@ -312,6 +312,7 @@ function DatasetView() {
     }
     // register socket events
     main_socket.on("processed_images", processedImagesData => {
+        console.log(processedImagesData);
         setTileData(processedImagesData);  // update the component state with new 'tileData'
     });
 

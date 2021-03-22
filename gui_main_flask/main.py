@@ -39,7 +39,7 @@ def images_received(apply_operations_data):
     print("connected successfully to APPLY_OPERATIONS")
     # manipulation_data is a dictionary as follows
     # for 1st manipulation data we have these
-    # param_1 : includes value of parameter in the appropiate range
+    # param_1 : includes value of parameter in the appropriate range
     # prob_1 : is the probability of images on which param 1 is applied
     # if parameter is not applied then that parameter should be marked 0 both param_i and prob_i
     images_data = apply_operations_data["images"]
@@ -65,7 +65,7 @@ def images_received(apply_operations_data):
             random_number = random.uniform(0, 1)
             if (manipulation_data["prob_"+str(i)]>=random_number):
                 if not modified:
-                    print("modification occured")
+                    print("modification occurred")
                 modified = True
                 img = function_store[i](image= img, factor= manipulation_data["param_"+str(i)])
 
