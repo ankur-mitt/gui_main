@@ -5,28 +5,17 @@ import {
     ButtonGroup,
     Slider,
     Grid,
-    // Input,
     InputLabel,
-    // InputAdornment,
     FormControl,
     Select,
     MenuItem,
     Paper,
     Typography
 } from "@material-ui/core";
-// import {fileOpen} from "browser-fs-access";
 import PreviewImagesComponent from "./PreviewImagesComponent";
 import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
-import {io, Socket} from "socket.io-client";
+import {io} from "socket.io-client";
 import {backendURL} from "./backendConfig";
-
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
-}
 
 //  function_number is the number of functions or operations that we can apply on the image, like noise, rotate, translate, zoom etc.
 let function_number = 4;
@@ -42,60 +31,16 @@ for (let i = 0; i <= 44; ++i) {
 let main_socket = io(backendURL, {transports: ['websocket'], upgrade: false});
 
 async function handleOpenAndReadFiles() {
-    // get files from user
-    // const blobs = await fileOpen({
-    //     mimeTypes: ["image/*"],
-    //     extensions: [".png", ".jpg", ".jpeg", ".bmp"],
-    //     multiple: true,
-    //     description: "Select ALL images"
-    // });
-    // console.log(blobs)
-    // let tileData = [];
-
-    // let name_list = blobs.map(item => item["name"])
-    // tileData = name_list.map(item => {
-    //     return {
-    //         src: "archive/Train/"+current_class.toString()+"/"+item,
-    //         alt: item
-    //     }
-    // })
-    // read the selected files' data
-    // for (let index = 0; index < blobs.length; ++index) {
-    //     const reader = new FileReader();
-    //     reader.onload = event =>{
-
-    //         tileData.push({src: event.target.result, alt: blobs[index].name})
-    //         name_list.push(blobs[index].name)
-    //     }
-
-    //     reader.readAsDataURL(blobs[index]);
-    // }
     if (!main_socket.connected) {
         main_socket.connect()
     }
     main_socket.emit("file_import", {
         "class": current_class,
     });
-    // masterTile[current_class.toString()] = tileData
-    // setTimeout(5000)
     return {data: [], numFiles: []};
 }
 
-function handleSelectFiles(setTileData) {
-    handleOpenAndReadFiles().then(result => {
-        // will come here only if data was read successfully
-        const stop = setInterval(() => {
-            if (result.data.length === result.numFiles) {
-                // setTileData(result.data);
-                clearInterval(stop);
-            }
-        }, 10);
-        // stop interval after 30s automatically - default
-        setTimeout(() => clearInterval(stop), 30000);
-    }).catch(reason => console.log(reason));
-}
-
-function handlePreviewImages(tileData) {
+function handlePreviewImages() {
     // manipulation_data is a dictionary as follows
     //  for 1st manipulation data we have these
     //  param_1 : includes value of parameter in the appropriate range, also parameter can be anything even an list
@@ -104,7 +49,7 @@ function handlePreviewImages(tileData) {
     // refer functions to get idea about range of these functions
     // 0 : add_noise | 1: rotate_image | 2: translate | 3: zoom
     let name_list = masterTile[current_class].map(item => item["alt"]);
-    console.log("about to send data");
+    // console.log("about to send data");
     let manipulation_data = {
         "param_0": value_array[0],
         "prob_0": probability_array[0],
@@ -119,14 +64,14 @@ function handlePreviewImages(tileData) {
         main_socket.connect();
     }
     if (main_socket.connected) {
-        console.log("ready to send");
+        // console.log("ready to send");
         main_socket.emit("apply_operations", {
             "images": name_list,
             "operations": manipulation_data,
             "class": current_class
         });
     }
-    console.log("data sent");
+    // console.log("data sent");
 }
 
 function ManipulationInputOptions({setTileData}) {
@@ -308,21 +253,19 @@ function ViewImages(setTileData) {
     }
     main_socket.emit("view_image", current_class)
     main_socket.on("view_image", data => {
-        console.log(data);        
+        // console.log(data);        
         let finalProcessedImagesData = data.map(item => {
             return {
                 src: "archive/Temp/"+current_class.toString()+"/"+item,
                 alt: "nothing"
             }
             })
-        console.log(finalProcessedImagesData)
+        // console.log(finalProcessedImagesData)
         masterTile[current_class.toString()] = finalProcessedImagesData
         setTileData(finalProcessedImagesData);
     })
 }
-function AugmentationOptionsComponent({tileData, setTileData}) {
-    // const [socket, ] = React.useState(io(backendURL));
-    // let socket = io(backendURL)
+function AugmentationOptionsComponent({setTileData}) {
     if (!main_socket.connected) {
         main_socket.connect()
     }
@@ -342,7 +285,7 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                                         title="apply-images"
                                         color="primary"
                                         startIcon={<BrushSharp/>}
-                                        onClick={() => handlePreviewImages(tileData)}
+                                        onClick={() => handlePreviewImages()}
                                     >
                                         Apply Operations
                                     </Button>
@@ -379,28 +322,27 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
 
 function DatasetView() {
     // setup state variables
-    // const [socket,] = React.useState(io(backendURL));   // main socket - to handle updates
     const [tileData, setTileData] = React.useState([]);
     if (!main_socket.connected) {
         main_socket.connect()
     }
     // register socket events
     main_socket.on("processed_images", processedImagesData => {
-        console.log(processedImagesData);        
+        // console.log(processedImagesData);        
         let finalProcessedImagesData = processedImagesData.map(item => {
             return {
                 src: "archive/Temp/" + current_class.toString() + "/" + item,
                 alt: "nothing"
             }
         });
-        console.log(finalProcessedImagesData);
+        // console.log(finalProcessedImagesData);
         masterTile[current_class.toString()] = finalProcessedImagesData;
         setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
         
     });
     main_socket.on("load-images", data => {
         if (data === "complete") {
-            console.log("received load-images");
+            // console.log("received load-images");
             setTileData([{
                 src: "logo192.png",
                 alt: "Ready"
@@ -412,7 +354,7 @@ function DatasetView() {
         <React.Fragment>
             <Grid container spacing={1}>
                 <Grid item xs={6}>
-                    <AugmentationOptionsComponent tileData={tileData} setTileData={setTileData}/>
+                    <AugmentationOptionsComponent setTileData={setTileData}/>
                 </Grid>
                 <Grid item xs={6}>
                     <PreviewImagesComponent tileData={tileData}/>
