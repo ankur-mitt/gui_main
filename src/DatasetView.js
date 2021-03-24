@@ -138,7 +138,7 @@ function ManipulationInputOptions({setTileData}) {
                 <Grid item xs={12}>
                     <Typography color="textPrimary" variant="h6">Select Class</Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <FormControl style={{minWidth: 250}}>
                         {/*<InputLabel id="select-class-label">Select Class</InputLabel>*/}
                         <Select
@@ -161,6 +161,11 @@ function ManipulationInputOptions({setTileData}) {
                             )}
                         </Select>
                     </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                    <Button title="Load-files" color="default" startIcon={<AddPhotoAlternateSharp/>} onClick={() => handleOpenAndReadFiles()}>
+                        Initiate Class
+                </Button>
                 </Grid>
             </Grid>
             <Grid item container xs={12} spacing={1}>
@@ -328,14 +333,6 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                         <Grid item container xs={12} spacing={1}>
                             <Grid item xs={8}>
                                 <ButtonGroup variant="contained">
-                                    <Button
-                                        title="Load-files"
-                                        color="default"
-                                        startIcon={<AddPhotoAlternateSharp/>}
-                                        onClick={() => handleOpenAndReadFiles()}
-                                    >
-                                        Initiate Class
-                                    </Button>
                                     <Button
                                         title="apply-images"
                                         color="primary"

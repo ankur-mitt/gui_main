@@ -48,7 +48,7 @@ def ml_runner():
     submit_dr = "../public/archive/Submit/"
     shutil.rmtree(submit_dr, ignore_errors=True)
     os.mkdir(submit_dr)
-    for selected_class in range(0, 41):
+    for selected_class in range(0, 43):
         working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
         train_dr = "../public/archive/Train/"+str(selected_class)+"/"
         final_name = []
