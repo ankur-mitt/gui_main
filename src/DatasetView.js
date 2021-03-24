@@ -390,15 +390,9 @@ function DatasetView() {
                 src: "archive/Temp/" + current_class.toString() + "/" + item,
                 alt: "nothing"
             }
-<<<<<<< HEAD
-            })
-        console.log(finalProcessedImagesData)
-        masterTile[current_class.toString()] = finalProcessedImagesData
-=======
         });
         console.log(finalProcessedImagesData);
         masterTile[current_class.toString()] = finalProcessedImagesData;
->>>>>>> e9877128ed52b6e661614f53912c3e1629ec4a23
         setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
         
     });
