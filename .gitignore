@@ -27,4 +27,5 @@ yarn-error.log*
 gui_main_flask/env
 gui_main_flask/testing.py
 archive/Temp/
+public/archive/
 gui_main_flask/__pycache__/augmentation_functions.cpython-38.pyc

@@ -19,37 +19,110 @@ import PreviewImagesComponent from "./PreviewImagesComponent";
 import {AddPhotoAlternateSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
 import {io} from "socket.io-client";
 import {backendURL} from "./backendConfig";
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
 //  function_number is the number of functions or operations that we can apply on the image, like noise, rotate, translate, zoom etc.
 let function_number = 4;
 let probability_array = new Array(function_number).fill(0);
 let value_array = new Array(function_number).fill(0);
+let current_class = 1
+let masterTile = {
+    "0": [],
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [],
+    "9": [],
+    "10": [],
+    "11": [],
+    "12": [],
+    "13": [],
+    "14": [],
+    "15": [],
+    "16": [],
+    "17": [],
+    "18": [],
+    "19": [],
+    "20": [],
+    "21": [],
+    "22": [],
+    "23": [],
+    "24": [],
+    "25": [],
+    "26": [],
+    "27": [],
+    "28": [],
+    "29": [],
+    "30": [],
+    "31": [],
+    "32": [],
+    "33": [],
+    "34": [],
+    "35": [],
+    "36": [],
+    "37": [],
+    "38": [],
+    "39": [],
+    "40": [],
+    "41": [],
+    "42": [],
+    "43": [],
+    "44": [],
+}
+
 // Starting Main Socket connection it will be restarted if it is disconnected and it is needed
 let main_socket = io(backendURL);
+
 async function handleOpenAndReadFiles() {
     // get files from user
     const blobs = await fileOpen({
         mimeTypes: ["image/*"],
         extensions: [".png", ".jpg", ".jpeg", ".bmp"],
         multiple: true,
-        description: "Select images"
+        description: "Select ALL images"
     });
-
+    console.log(blobs)
     let tileData = [];
+    
+    let name_list = blobs.map(item => item["name"])
+    tileData = name_list.map(item => {
+        return {
+            src: "archive/Train/"+current_class.toString()+"/"+item,
+            alt: item
+        }
+    })
     // read the selected files' data
-    for (let index = 0; index < blobs.length; ++index) {
-        const reader = new FileReader();
-        reader.onload = event => tileData.push({src: event.target.result, alt: blobs[index].name});
-        /* for progress management
-        reader.onprogress = event => {
-            if (event.loaded && event.total) {
-                const percent = (event.loaded / event.total) * 100;
-                console.log(`Progress: ${Math.round(percent)}`);
-            }
-        };
-        */
-        reader.readAsDataURL(blobs[index]);
+    // for (let index = 0; index < blobs.length; ++index) {
+    //     const reader = new FileReader();
+    //     reader.onload = event =>{
+            
+    //         tileData.push({src: event.target.result, alt: blobs[index].name})
+    //         name_list.push(blobs[index].name)
+    //     }
+        
+    //     reader.readAsDataURL(blobs[index]);
+    // }
+    if (!main_socket.connected) {
+        main_socket.connect()
     }
-    return {data: tileData, numFiles: blobs.length};
+    console.log(blobs)
+    main_socket.emit("file_import", {
+        "class": current_class,
+        "name_list": name_list
+    })
+    console.log(tileData)
+    masterTile[current_class.toString()] = tileData
+    setTimeout(5000)
+    return {data: [], numFiles: []};   
 }
 
 function handleSelectFiles(setTileData) {
@@ -57,7 +130,7 @@ function handleSelectFiles(setTileData) {
         // will come here only if data was read successfully
         const stop = setInterval(() => {
             if (result.data.length === result.numFiles) {
-                setTileData(result.data);
+                // setTileData(result.data);
                 clearInterval(stop);
             }
         }, 10);
@@ -74,6 +147,7 @@ function handlePreviewImages(tileData) {
     //  if parameter is not applied then that parameter should be marked 0 both param_i and prob_i
     // refer functions to get idea about range of these functions
     // 0 : add_noise | 1: rotate_image | 2: translate | 3: zoom
+            let name_list = masterTile[current_class].map(item => item["alt"])
             console.log("about to send data");
             let manipulation_data = {
                 "param_0": value_array[0],
@@ -90,12 +164,14 @@ function handlePreviewImages(tileData) {
             }
             if (main_socket.connected) {
                 console.log("ready to send");
-                main_socket.emit("apply_operations", {"images":tileData, "operations": manipulation_data});
+                main_socket.emit("apply_operations", {"images":name_list, 
+                                                    "operations": manipulation_data,
+                                                    "class":current_class});
             }
             console.log("data sent");
 }
 
-function ManipulationInputOptions() {
+function ManipulationInputOptions({setTileData}) {
     const [classValue, setClassValue] = React.useState(1);
 
     return (
@@ -111,11 +187,63 @@ function ManipulationInputOptions() {
                             labelId="select-class-label"
                             id="select-class"
                             value={classValue}
-                            onChange={event => setClassValue(event.target.value)}
+                            onChange={event => {
+                                setClassValue(event.target.value)
+                                console.log(event.target.value)
+                                current_class = event.target.value
+                                try{
+                                    setTileData(masterTile[current_class.toString()])
+                                } catch(e)
+                                {
+                                    console.log("next "+e)
+                                }
+                            }}
                         >
-                            <MenuItem value={1}>Class One</MenuItem>
-                            <MenuItem value={2}>Class Two</MenuItem>
-                            <MenuItem value={3}>Class Three</MenuItem>
+                            <MenuItem value={0}>0</MenuItem>
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={2}>2</MenuItem>
+                            <MenuItem value={3}>3</MenuItem>
+                            <MenuItem value={4}>4</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                            <MenuItem value={6}>6</MenuItem>
+                            <MenuItem value={7}>7</MenuItem>
+                            <MenuItem value={8}>8</MenuItem>
+                            <MenuItem value={9}>9</MenuItem>
+                            <MenuItem value={10}>10</MenuItem>
+                            <MenuItem value={11}>11</MenuItem>
+                            <MenuItem value={12}>12</MenuItem>
+                            <MenuItem value={13}>13</MenuItem>
+                            <MenuItem value={14}>14</MenuItem>
+                            <MenuItem value={15}>15</MenuItem>
+                            <MenuItem value={16}>16</MenuItem>
+                            <MenuItem value={17}>17</MenuItem>
+                            <MenuItem value={18}>18</MenuItem>
+                            <MenuItem value={19}>19</MenuItem>
+                            <MenuItem value={20}>20</MenuItem>
+                            <MenuItem value={21}>21</MenuItem>
+                            <MenuItem value={22}>22</MenuItem>
+                            <MenuItem value={23}>23</MenuItem>
+                            <MenuItem value={24}>24</MenuItem>
+                            <MenuItem value={25}>25</MenuItem>
+                            <MenuItem value={26}>26</MenuItem>
+                            <MenuItem value={27}>27</MenuItem>
+                            <MenuItem value={28}>28</MenuItem>
+                            <MenuItem value={29}>29</MenuItem>
+                            <MenuItem value={30}>30</MenuItem>
+                            <MenuItem value={31}>31</MenuItem>
+                            <MenuItem value={32}>32</MenuItem>
+                            <MenuItem value={33}>33</MenuItem>
+                            <MenuItem value={34}>34</MenuItem>
+                            <MenuItem value={35}>35</MenuItem>
+                            <MenuItem value={36}>36</MenuItem>
+                            <MenuItem value={37}>37</MenuItem>
+                            <MenuItem value={38}>38</MenuItem>
+                            <MenuItem value={39}>39</MenuItem>
+                            <MenuItem value={40}>40</MenuItem>
+                            <MenuItem value={41}>41</MenuItem>
+                            <MenuItem value={42}>42</MenuItem>
+                            <MenuItem value={43}>43</MenuItem>
+                            <MenuItem value={44}>44</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -263,12 +391,12 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                         Augmentation options
                     </Typography>
                     <Grid container spacing={3}>
-                        <ManipulationInputOptions/>
+                        <ManipulationInputOptions setTileData={setTileData} />
                         <Grid item container xs={12} spacing={1}>
                             <Grid item xs={8}>
                                 <ButtonGroup variant="contained">
                                     <Button
-                                        title="select-files"
+                                        title="Load-files"
                                         color="default"
                                         startIcon={<AddPhotoAlternateSharp/>}
                                         onClick={() => handleSelectFiles(setTileData)}
@@ -313,8 +441,32 @@ function DatasetView() {
     // register socket events
     main_socket.on("processed_images", processedImagesData => {
         console.log(processedImagesData);
-        setTileData(processedImagesData);  // update the component state with new 'tileData'
+        let finalProcessedImagesData = processedImagesData.map(item => {
+            return {
+                src: "archive/Temp/"+current_class.toString()+"/"+item,
+                alt: "nothing"
+            }
+        })
+        // finalProcessedImagesData.forEach(element => {
+        //     let t_obj = {
+        //         src: "archive/Test/"+current_class.toString()+"/"+element,
+        //         alt: "nothing"
+        //     }
+        //     finalProcessedImagesData.push(t_obj)
+        // });
+        console.log(finalProcessedImagesData)
+        masterTile[current_class.toString()] = finalProcessedImagesData
+        setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
     });
+    main_socket.on("load-images", data => {
+        if (data=="complete") {
+            console.log("recieved load-images")
+            setTileData([{
+                src: "logo192.png",
+                alt: "Ready"
+            }])
+        }
+    })
 
     return (
         <React.Fragment>

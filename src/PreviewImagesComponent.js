@@ -12,7 +12,7 @@ function PreviewImagesComponent({tileData}) {
                     <GridList cols={4}>
                         {tileData.map((tile, index) =>
                             <GridListTile key={index} cols={1} style={{padding: "0.5rem"}}>
-                                <img src={tile.src} alt={tile.alt}/>
+                                <img src={tile.src} /*"archive/Temp/1/00001_00000_00000.png"*/ alt={tile.alt}/>
                             </GridListTile>
                         )}
                     </GridList>
