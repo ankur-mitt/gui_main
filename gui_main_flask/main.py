@@ -36,11 +36,22 @@ def first_time_setup(data):
     os.mkdir(temp_path)
     print("ending file_import")
 
+@socketio.on("initiate-all")
+def initiate_all():
+    for selected_class in range(0, 43):
+        temp_path = "../public/archive/Temp/"+str(selected_class)+"/"
+        shutil.rmtree(temp_path, ignore_errors=True)
+        os.mkdir(temp_path)
+        print("ending class_initaition for "+str(selected_class))
+
 @socketio.on("view_image")
 def view_master(selected_class):
     working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
     names_modified = os.listdir(working_dr)
-    socketio.emit("view_image", random.sample(names_modified, 50))
+    if len(names_modified)<60:
+        socketio.emit("view_image", random.sample(names_modified, len(names_modified)))
+    else:
+        socketio.emit("view_image", random.sample(names_modified, 60))
 
 @socketio.on("submit_data")
 def ml_runner():

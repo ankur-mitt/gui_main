@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 // import {fileOpen} from "browser-fs-access";
 import PreviewImagesComponent from "./PreviewImagesComponent";
-import {AddPhotoAlternateSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
+import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
 import {io, Socket} from "socket.io-client";
 import {backendURL} from "./backendConfig";
 
@@ -163,9 +163,14 @@ function ManipulationInputOptions({setTileData}) {
                     </FormControl>
                 </Grid>
                 <Grid item xs={6}>
-                    <Button title="Load-files" color="default" startIcon={<AddPhotoAlternateSharp/>} onClick={() => handleOpenAndReadFiles()}>
-                        Initiate Class
-                </Button>
+                    <ButtonGroup variant="outlined" size="small">
+                        <Button title="initiate-single" startIcon={<PlayArrowSharp/>} onClick={() => handleOpenAndReadFiles()}>
+                            Initiate Class
+                        </Button>
+                        <Button title="initiate-all" startIcon={<PlayArrowSharp/>} onClick={() => main_socket.emit("initiate-all")}>
+                            Initiate All
+                        </Button>
+                    </ButtonGroup>
                 </Grid>
             </Grid>
             <Grid item container xs={12} spacing={1}>
@@ -336,7 +341,7 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                                     <Button
                                         title="apply-images"
                                         color="primary"
-                                        startIcon={<VisibilitySharp/>}
+                                        startIcon={<BrushSharp/>}
                                         onClick={() => handlePreviewImages(tileData)}
                                     >
                                         Apply Operations
