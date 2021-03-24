@@ -84,22 +84,22 @@ let main_socket = io(backendURL);
 
 async function handleOpenAndReadFiles() {
     // get files from user
-    const blobs = await fileOpen({
-        mimeTypes: ["image/*"],
-        extensions: [".png", ".jpg", ".jpeg", ".bmp"],
-        multiple: true,
-        description: "Select ALL images"
-    });
-    console.log(blobs)
-    let tileData = [];
+    // const blobs = await fileOpen({
+    //     mimeTypes: ["image/*"],
+    //     extensions: [".png", ".jpg", ".jpeg", ".bmp"],
+    //     multiple: true,
+    //     description: "Select ALL images"
+    // });
+    // console.log(blobs)
+    // let tileData = [];
     
-    let name_list = blobs.map(item => item["name"])
-    tileData = name_list.map(item => {
-        return {
-            src: "archive/Train/"+current_class.toString()+"/"+item,
-            alt: item
-        }
-    })
+    // let name_list = blobs.map(item => item["name"])
+    // tileData = name_list.map(item => {
+    //     return {
+    //         src: "archive/Train/"+current_class.toString()+"/"+item,
+    //         alt: item
+    //     }
+    // })
     // read the selected files' data
     // for (let index = 0; index < blobs.length; ++index) {
     //     const reader = new FileReader();
@@ -114,14 +114,11 @@ async function handleOpenAndReadFiles() {
     if (!main_socket.connected) {
         main_socket.connect()
     }
-    console.log(blobs)
     main_socket.emit("file_import", {
         "class": current_class,
-        "name_list": name_list
     })
-    console.log(tileData)
-    masterTile[current_class.toString()] = tileData
-    setTimeout(5000)
+    // masterTile[current_class.toString()] = tileData
+    // setTimeout(5000)
     return {data: [], numFiles: []};   
 }
 
@@ -399,7 +396,7 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                                         title="Load-files"
                                         color="default"
                                         startIcon={<AddPhotoAlternateSharp/>}
-                                        onClick={() => handleSelectFiles(setTileData)}
+                                        onClick={()=> handleOpenAndReadFiles()}
                                     >
                                         Select Files
                                     </Button>
@@ -447,13 +444,6 @@ function DatasetView() {
                 alt: "nothing"
             }
         })
-        // finalProcessedImagesData.forEach(element => {
-        //     let t_obj = {
-        //         src: "archive/Test/"+current_class.toString()+"/"+element,
-        //         alt: "nothing"
-        //     }
-        //     finalProcessedImagesData.push(t_obj)
-        // });
         console.log(finalProcessedImagesData)
         masterTile[current_class.toString()] = finalProcessedImagesData
         setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
