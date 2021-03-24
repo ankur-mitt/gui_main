@@ -17,7 +17,7 @@ import {
 import {fileOpen} from "browser-fs-access";
 import PreviewImagesComponent from "./PreviewImagesComponent";
 import {AddPhotoAlternateSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
-import {io} from "socket.io-client";
+import {io, Socket} from "socket.io-client";
 import {backendURL} from "./backendConfig";
 function sleep(milliseconds) {
     const date = Date.now();
@@ -80,7 +80,7 @@ let masterTile = {
 }
 
 // Starting Main Socket connection it will be restarted if it is disconnected and it is needed
-let main_socket = io(backendURL);
+let main_socket = io(backendURL, {transports: ['websocket'], upgrade: false});
 
 async function handleOpenAndReadFiles() {
     // get files from user
@@ -374,6 +374,24 @@ function ManipulationInputOptions({setTileData}) {
     );
 }
 
+function ViewImages(setTileData) {
+    if (!main_socket.connected) {
+        main_socket.connect()
+    }
+    main_socket.emit("view_image", current_class)
+    main_socket.on("view_image", data => {
+        console.log(data);        
+        let finalProcessedImagesData = data.map(item => {
+            return {
+                src: "archive/Temp/"+current_class.toString()+"/"+item,
+                alt: "nothing"
+            }
+            })
+        console.log(finalProcessedImagesData)
+        masterTile[current_class.toString()] = finalProcessedImagesData
+        setTileData(finalProcessedImagesData);
+    })
+}
 function AugmentationOptionsComponent({tileData, setTileData}) {
     // const [socket, ] = React.useState(io(backendURL));
     // let socket = io(backendURL)
@@ -398,13 +416,21 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                                         startIcon={<AddPhotoAlternateSharp/>}
                                         onClick={()=> handleOpenAndReadFiles()}
                                     >
-                                        Select Files
+                                        Initiate Class
                                     </Button>
                                     <Button
-                                        title="preview-images"
+                                        title="apply-images"
                                         color="primary"
                                         startIcon={<VisibilitySharp/>}
                                         onClick={() => handlePreviewImages(tileData)}
+                                    >
+                                        Apply Operations
+                                    </Button>
+                                    <Button
+                                        title="preview-images"
+                                        color="default"
+                                        startIcon={<VisibilitySharp/>}
+                                        onClick={() => ViewImages(setTileData)}
                                     >
                                         Preview Images
                                     </Button>
@@ -416,6 +442,9 @@ function AugmentationOptionsComponent({tileData, setTileData}) {
                                     variant="contained"
                                     color="secondary"
                                     startIcon={<CloudUploadSharp/>}
+                                    onClick={() => {
+                                        main_socket.emit("submit_data")
+                                    }}
                                 >
                                     Submit Dataset
                                 </Button>
@@ -437,16 +466,17 @@ function DatasetView() {
     }
     // register socket events
     main_socket.on("processed_images", processedImagesData => {
-        console.log(processedImagesData);
+        console.log(processedImagesData);        
         let finalProcessedImagesData = processedImagesData.map(item => {
             return {
                 src: "archive/Temp/"+current_class.toString()+"/"+item,
                 alt: "nothing"
             }
-        })
+            })
         console.log(finalProcessedImagesData)
         masterTile[current_class.toString()] = finalProcessedImagesData
         setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
+        
     });
     main_socket.on("load-images", data => {
         if (data=="complete") {

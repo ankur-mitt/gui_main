@@ -26,7 +26,7 @@ def connected_successfully():
 
 @socketio.on('disconnect')
 def test_disconnect():
-    print('Client disconnected')
+    print('Client disconnected: ')
 
 @socketio.on('file_import')
 def first_time_setup(data):
@@ -35,6 +35,41 @@ def first_time_setup(data):
     shutil.rmtree(temp_path, ignore_errors=True)
     os.mkdir(temp_path)
     print("ending file_import")
+
+@socketio.on("view_image")
+def view_master(selected_class):
+    working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
+    names_modified = os.listdir(working_dr)
+    socketio.emit("view_image", random.sample(names_modified, 50))
+
+@socketio.on("submit_data")
+def ml_runner():
+    print("entered ml_runner")
+    submit_dr = "../public/archive/Submit/"
+    shutil.rmtree(submit_dr, ignore_errors=True)
+    os.mkdir(submit_dr)
+    for selected_class in range(0, 41):
+        working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
+        train_dr = "../public/archive/Train/"+str(selected_class)+"/"
+        final_name = []
+        final_paths = []
+        class_submit = submit_dr+str(selected_class)+"/"
+        print("entering class "+str(selected_class))
+        names_original = os.listdir(train_dr)
+        path_original = list(map(lambda x : train_dr+str(x), names_original ))
+        if os.path.exists(working_dr):
+            names_modified = os.listdir(working_dr)
+            path_modified = list(map(lambda x : working_dr+str(x), names_modified ))
+            final_paths = path_modified+path_original
+            final_name = names_modified+names_original
+        else:
+            final_name = names_original
+            final_paths = path_original
+        os.mkdir(class_submit)
+        for path, name in zip(final_paths, final_name):
+            img = Image.open(path)
+            img.save(class_submit+name)
+        
 
 # images received to apply operations
 @socketio.on("apply_operations")
@@ -59,6 +94,8 @@ def images_received(apply_operations_data):
     # Holder Lists to store information about images to be saved in temp folder
     save_images_file = []
     save_images_name = []
+    print("original dataset length is "+str(len(names_original))+", and temp dataset length is "+str(len(names_modified)))
+    msg_sent = False
 
     # First Reading From Original Dataset
     for i in range(0, len(names_original)):
@@ -83,7 +120,7 @@ def images_received(apply_operations_data):
             pil_img = Image.fromarray((img * 255).astype(np.uint8))
             save_images_file.append(pil_img)
             save_images_name.append("m_"+file_name)
-
+    print("now reading temp data")
     # Second Reading From Temp DataSet
     for i in range(0, len(names_modified)):
         file_path = path_modified[i]
@@ -117,9 +154,9 @@ def images_received(apply_operations_data):
     for i in range(0,len(save_images_file)):
         save_images_file[i].save(working_dr+save_images_name[i])
     # send file names (not paths) to frontend of only modified files
-    
-    socketio.emit("processed_images", save_images_name)
-    print("ending apply_operations")
+    if not msg_sent:
+        socketio.emit("processed_images", save_images_name)
+        print("ending apply_operations")
 
 if __name__ == '__main__':
     socketio.run(app)
