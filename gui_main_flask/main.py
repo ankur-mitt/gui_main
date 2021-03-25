@@ -139,7 +139,10 @@ def csv_data(data):
     for caller in augment_store:
         data_to_send.append(caller(y_true, y_pred))
     print(data_to_send[3])
-    socketio.emit("result_array", {})
+    data_to_send = int(data_to_send)
+    for elem in data_to_send:
+        if elem
+    socketio.emit("result_array", data_to_send)
     
 # images received to apply operations
 @socketio.on("apply_operations")
