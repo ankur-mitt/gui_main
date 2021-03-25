@@ -38,6 +38,7 @@ let masterTile = {};
 for (let i = 0; i <= 44; ++i) {
     masterTile[i.toString()] = [];
 }
+let splitting_ratio = 0.3;
 
 function handleApplyOperations() {
     // manipulation_data is a dictionary as follows
@@ -370,7 +371,12 @@ function DatasetView() {
             }]);
         }
     });
-    main_socket.on("progress", progress => setSubmissionProgress(progress));
+    main_socket.on("progress", progress => {
+        setSubmissionProgress(progress);
+        if (progress === 100) {
+            setDatasetCreatedSuccessfully(true);
+        }
+    });
 
     return (
         <React.Fragment>
@@ -384,22 +390,26 @@ function DatasetView() {
             </Grid>
             {submitDialogOpen && (
                 <Dialog onClose={() => setSubmitDialogOpen(false)} aria-labelledby="submission-dialog"
-                        open={submitDialogOpen}>
+                        open={submitDialogOpen} maxWidth="sm" fullWidth>
                     <DialogTitle id="submission-dialog-title">Confirm Submission</DialogTitle>
                     <DialogContent>
-                        <Typography>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Impedit minus necessitatibus nihil
-                            ratione repellendus. Blanditiis dolorum earum facilis inventore iste maiores, mollitia quas
-                            rem vero voluptatum. Aperiam aut commodi dolores est hic laborum possimus quas, recusandae
-                            rem similique. Consectetur consequatur cupiditate harum nemo nobis officia perspiciatis
-                            similique vel veritatis voluptas!
+                        <Typography id="splitting-ratio-title" component={InputLabel} gutterBottom>
+                            Splitting Ratio
                         </Typography>
+                        <Slider defaultValue={splitting_ratio} min={0} max={1} step={0.05} marks
+                                aria-labelledby="splitting-ratio-title"
+                                valueLabelDisplay="auto"
+                                onChange={(e, value) => {
+                                    splitting_ratio = value;
+                                }}
+                                getAriaValueText={value => `${value * 100}%`}
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
                             // make the submit folder and populate with original and temp data
-                            // main_socket.emit("submit_data");
+                            // main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
                             setSubmitDialogOpen(false);
                             setMakingSubmissionDataset(true);
                         }}>
@@ -409,14 +419,26 @@ function DatasetView() {
                 </Dialog>
             )}
             {makingSubmissionDataset && (
-                <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth={true}>
+                <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth>
                     <DialogTitle>Creating Final Dataset</DialogTitle>
-                    <DialogContent><LinearProgress variant="determinate" value={submissionProgress}/></DialogContent>
+                    <DialogContent>
+                        <Box display="flex" alignItems="center">
+                            <Box width="100%" mr={1}>
+                                <LinearProgress variant="determinate" value={submissionProgress} />
+                            </Box>
+                            <Box minWidth={35}>
+                                <Typography variant="body2" color="textSecondary">
+                                    {`${Math.round(submissionProgress)}%`}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </DialogContent>
                     <DialogActions>
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
-                            setDatasetCreatedSuccessfully(true);
-                        }} disabled={!datasetCreatedSuccessfully}>Train Model</Button>
+                            main_socket.emit("open_submit_folder");
+                            setTimeout(() => setMakingSubmissionDataset(false), 5000);
+                        }} disabled={!datasetCreatedSuccessfully}>Open Dataset Folder</Button>
                     </DialogActions>
                 </Dialog>
             )}
