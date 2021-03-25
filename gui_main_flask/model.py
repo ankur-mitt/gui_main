@@ -15,11 +15,11 @@ np.random.seed(42)
 from matplotlib import style
 style.use('fivethirtyeight')
 
-def ML_model(spliter):
+def ML_model(spliter, lr_rate):
     # Assigning Path for Dataset
     data_dir = '../public/archive'
-    train_path = '../input/gtsrb-german-traffic-sign/Train'
-    test_path = '../input/gtsrb-german-traffic-sign/'
+    train_path = '../public/archive/Submit'
+    test_path = '../public/archive/Test'
 
     # Resizing the images to 30x30x3
     IMG_HEIGHT = 30
@@ -27,9 +27,30 @@ def ML_model(spliter):
     channels = 3
 
     NUM_CATEGORIES = len(os.listdir(train_path))
-    NUM_CATEGORIES
 
-    # Label Overview
+    image_data = []
+    image_labels = []
+
+    for i in range(NUM_CATEGORIES):
+        path = data_dir + '/Train/' + str(i)
+        images = os.listdir(path)
+
+        for img in images:
+            try:
+                image = cv2.imread(path + '/' + img)
+                image_fromarray = Image.fromarray(image, 'RGB')
+                resize_image = image_fromarray.resize((IMG_HEIGHT, IMG_WIDTH))
+                image_data.append(np.array(resize_image))
+                image_labels.append(i)
+            except NameError:
+                print("Error in " + img)
+
+    # Changing the list to numpy array
+    image_data = np.array(image_data)
+    image_labels = np.array(image_labels)
+
+    # print(image_data.shape, image_labels.shape)
+
     classes = { 0:'Speed limit (20km/h)',
                 1:'Speed limit (30km/h)', 
                 2:'Speed limit (50km/h)', 
@@ -96,17 +117,7 @@ def ML_model(spliter):
     image_data = image_data[shuffle_indexes]
     image_labels = image_labels[shuffle_indexes]
 
-    X_train, X_val, y_train, y_val = train_test_split(image_data, image_labels, test_size=0.3, random_state=42, shuffle=True)
-
-    X_train = X_train/255 
-    X_val = X_val/255
-
-    # print("X_train.shape", X_train.shape)
-    # print("X_valid.shape", X_val.shape)
-    # print("y_train.shape", y_train.shape)
-    # print("y_valid.shape", y_val.shape)
-
-    X_train, X_val, y_train, y_val = train_test_split(image_data, image_labels, test_size=0.3, random_state=42, shuffle=True)
+    X_train, X_val, y_train, y_val = train_test_split(image_data, image_labels, test_size=spliter, random_state=42, shuffle=True)
 
     X_train = X_train/255 
     X_val = X_val/255
@@ -149,12 +160,7 @@ def ML_model(spliter):
 
     # Augmenting the data and training the model
     history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_val, y_val))
-    # Evaluating the model
-    pd.DataFrame(history.history).plot(figsize=(8, 5))
-    plt.grid(True)
-    plt.gca().set_ylim(0, 1)
-    plt.show()
-
+    
     # Loading the test data and running the predictions
 
     test = pd.read_csv(data_dir + '/Test.csv')
@@ -170,13 +176,21 @@ def ML_model(spliter):
             image_fromarray = Image.fromarray(image, 'RGB')
             resize_image = image_fromarray.resize((IMG_HEIGHT, IMG_WIDTH))
             data.append(np.array(resize_image))
-        except:
+        except NameError:
             print("Error in " + img)
     X_test = np.array(data)
     X_test = X_test/255
 
     pred = model.predict_classes(X_test)
 
+    with open('your_file.csv', 'w') as f:
+        for item in labels:
+            f.write("%s," % item)
+        f.write("\n" % item)
+        for item in pred:
+            f.write("%s," % item)
+
 #Accuracy with the test data
 # print('Test Data accuracy: ',accuracy_score(labels, pred)*100)
 
+ML_model(0.3, 0.01)

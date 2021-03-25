@@ -342,6 +342,7 @@ function DatasetView() {
     const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
     const [makingSubmissionDataset, setMakingSubmissionDataset] = React.useState(false);
     const [datasetCreatedSuccessfully, setDatasetCreatedSuccessfully] = React.useState(false);
+    const [submissionProgress, setSubmissionProgress] = React.useState(0);
 
     if (!main_socket.connected) {
         main_socket.connect();
@@ -369,6 +370,7 @@ function DatasetView() {
             }]);
         }
     });
+    main_socket.on("progress", progress => setSubmissionProgress(progress));
 
     return (
         <React.Fragment>
@@ -409,11 +411,7 @@ function DatasetView() {
             {makingSubmissionDataset && (
                 <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth={true}>
                     <DialogTitle>Creating Final Dataset</DialogTitle>
-                    <DialogContent>
-                        {datasetCreatedSuccessfully
-                            ? <LinearProgress variant="determinate" value={100}/>
-                            : <LinearProgress/>}
-                    </DialogContent>
+                    <DialogContent><LinearProgress variant="determinate" value={submissionProgress}/></DialogContent>
                     <DialogActions>
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();

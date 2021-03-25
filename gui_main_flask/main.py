@@ -67,6 +67,8 @@ def ml_runner():
         class_submit = submit_dr+str(selected_class)+"/"
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
+        # progress indication
+        socketio.emit("progress-show", selected_class*100/43)
         path_original = list(map(lambda x : train_dr+str(x), names_original ))
         if os.path.exists(working_dr):
             names_modified = os.listdir(working_dr)
