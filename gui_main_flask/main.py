@@ -158,7 +158,7 @@ def csv_data(data):
         "precision":precision,
         "f_one":f_one,
         "recall":recall,
-        "report": report
+        # "report": report
     })
     print("nice")
     
