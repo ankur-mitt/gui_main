@@ -10,7 +10,11 @@ import {
     Select,
     MenuItem,
     Paper,
-    Typography
+    Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from "@material-ui/core";
 import PreviewImagesComponent from "./PreviewImagesComponent";
 import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
@@ -267,7 +271,7 @@ function handlePreviewImages(setTileData) {
     });
 }
 
-function AugmentationOptionsComponent({setTileData}) {
+function AugmentationOptionsComponent({setTileData, setSubmitDialogOpen}) {
     if (!main_socket.connected) {
         main_socket.connect()
     }
@@ -316,8 +320,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                     startIcon={<CloudUploadSharp/>}
                                     onClick={(event) => {
                                         event.preventDefault();
-                                        // make the submit folder and populate with original and temp data
-                                        main_socket.emit("submit_data");
+                                        // show the submission confirmation dialog
+                                        setSubmitDialogOpen(true);
                                     }}
                                 >
                                     Submit Dataset
@@ -334,6 +338,8 @@ function AugmentationOptionsComponent({setTileData}) {
 function DatasetView() {
     // setup state variables
     const [tileData, setTileData] = React.useState([]);
+    const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
+
     if (!main_socket.connected) {
         main_socket.connect();
     }
@@ -365,12 +371,36 @@ function DatasetView() {
         <React.Fragment>
             <Grid container spacing={1}>
                 <Grid item xs={6}>
-                    <AugmentationOptionsComponent setTileData={setTileData}/>
+                    <AugmentationOptionsComponent setTileData={setTileData} setSubmitDialogOpen={setSubmitDialogOpen}/>
                 </Grid>
                 <Grid item xs={6}>
                     <PreviewImagesComponent tileData={tileData}/>
                 </Grid>
             </Grid>
+            {submitDialogOpen && (
+                <Dialog onClose={() => setSubmitDialogOpen(false)} aria-labelledby="submission-dialog"
+                        open={submitDialogOpen}>
+                    <DialogTitle id="submission-dialog-title">Confirm Submission</DialogTitle>
+                    <DialogContent>
+                        <Typography>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Impedit minus necessitatibus nihil
+                            ratione repellendus. Blanditiis dolorum earum facilis inventore iste maiores, mollitia quas
+                            rem vero voluptatum. Aperiam aut commodi dolores est hic laborum possimus quas, recusandae
+                            rem similique. Consectetur consequatur cupiditate harum nemo nobis officia perspiciatis
+                            similique vel veritatis voluptas!
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button autoFocus color="primary" onClick={event => {
+                            event.preventDefault();
+                            // make the submit folder and populate with original and temp data
+                            main_socket.emit("submit_data");
+                        }}>
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </React.Fragment>
     );
 }
