@@ -90,7 +90,7 @@ def Confusion_Matrix(y_true, y_pred):
   return cf
 
 
-def data_dictonary(y_true, y_pred):
+def data_dictionary(y_true, y_pred):
 
     temp = precision_recall_fscore_support(y_true, y_pred, average=None)
     data_to_return = []
