@@ -100,11 +100,17 @@ function ManipulationInputOptions({setTileData}) {
                 <Grid item xs={6}>
                     <ButtonGroup variant="outlined" size="small">
                         <Button title="initiate-single" startIcon={<PlayArrowSharp/>}
-                                onClick={() => main_socket.emit("file_import", {"class": current_class})}>
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    main_socket.emit("file_import", {"class": current_class});
+                                }}>
                             Initiate Class
                         </Button>
                         <Button title="initiate-all" startIcon={<PlayArrowSharp/>}
-                                onClick={() => main_socket.emit("initiate-all")}>
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    main_socket.emit("initiate-all");
+                                }}>
                             Initiate All
                         </Button>
                     </ButtonGroup>
@@ -281,8 +287,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                         title="apply-images"
                                         color="primary"
                                         startIcon={<BrushSharp/>}
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={(event) => {
+                                            event.preventDefault();
                                             handleApplyOperations();
                                         }}
                                     >
@@ -292,8 +298,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                         title="preview-images"
                                         color="default"
                                         startIcon={<VisibilitySharp/>}
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={(event) => {
+                                            event.preventDefault();
                                             // load the temp data: some images randomly
                                             handlePreviewImages(setTileData);
                                         }}
@@ -308,8 +314,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                     variant="contained"
                                     color="secondary"
                                     startIcon={<CloudUploadSharp/>}
-                                    onClick={(e) => {
-                                        e.preventDefault();
+                                    onClick={(event) => {
+                                        event.preventDefault();
                                         // make the submit folder and populate with original and temp data
                                         main_socket.emit("submit_data");
                                     }}
