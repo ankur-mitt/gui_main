@@ -10,9 +10,11 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image
+import easygui
 from augmentation_functions import add_noise, rotate_image, translate, zoom
-# from result import labels_Pred, Confusion, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
+from result import labels_Pred, Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
 function_store = [add_noise, rotate_image, translate, zoom]
+augment_store = [Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report]
 number_operations = len(function_store)
 app = Flask(__name__)
 # enable cors
@@ -21,6 +23,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", ping_timeout=300, ping_interv
 base_path = str(Path(__file__).parent.parent)+"\\public\\archive\\"
 train_path = base_path+"Train"
 temp_path = base_path + "Temp"
+
 
 @socketio.on("connect")
 def connected_successfully():
@@ -71,6 +74,8 @@ def ml_runner(data):
         class_submit = submit_dr+str(selected_class)+"/"
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
+        # progress indication
+        socketio.emit("progress", {"progress": selected_class*100/43})
         path_original = list(map(lambda x : train_dr+str(x), names_original ))
         if os.path.exists(working_dr):
             names_modified = os.listdir(working_dr)
@@ -86,11 +91,16 @@ def ml_runner(data):
             img.save(class_submit+name)
      
 @socketio.on("result_setup")
-def result_master(data):
-    root = tk.Tk()
-    root.withdraw()
-    file_path = filedialog.askopenfilename()
+def result_master():
+    print("entered result_setup")
+    file_path = easygui.fileopenbox()
+    print("shown files")
     data_to_send = []
+    y_pred, y_true = labels_Pred(file_path)
+    for caller in augment_store:
+        data_to_send.append(caller(y_true, y_pred))
+    socketio.emit("result_array", data_to_send)
+
 
 # images received to apply operations
 @socketio.on("apply_operations")
