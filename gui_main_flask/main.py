@@ -34,7 +34,7 @@ def first_time_setup(data):
     temp_path = "../public/archive/Temp/"+str(selected_class)+"/"
     shutil.rmtree(temp_path, ignore_errors=True)
     os.mkdir(temp_path)
-    print("ending file_import")
+    print("initiated class "+str(data["class"]))
 
 @socketio.on("initiate-all")
 def initiate_all():
@@ -80,7 +80,7 @@ def ml_runner():
         for path, name in zip(final_paths, final_name):
             img = Image.open(path)
             img.save(class_submit+name)
-        
+     
 
 # images received to apply operations
 @socketio.on("apply_operations")
