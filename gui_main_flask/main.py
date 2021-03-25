@@ -7,10 +7,7 @@ import random
 import os
 import shutil
 from pathlib import Path
-import tkinter as tk
-from tkinter import filedialog
 from PIL import Image
-import easygui
 from augmentation_functions import add_noise, rotate_image, translate, zoom
 from result import labels_Pred, Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
 function_store = [add_noise, rotate_image, translate, zoom]
@@ -92,9 +89,6 @@ def ml_runner(data):
      
 @socketio.on("result_setup")
 def result_master():
-    print("entered result_setup")
-    file_path = easygui.fileopenbox()
-    print("shown files")
     data_to_send = []
     y_pred, y_true = labels_Pred(file_path)
     for caller in augment_store:
