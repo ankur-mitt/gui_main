@@ -342,12 +342,12 @@ function DatasetView() {
     const [tileData, setTileData] = React.useState([]);
     const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
     const [makingSubmissionDataset, setMakingSubmissionDataset] = React.useState(false);
-    const [datasetCreatedSuccessfully, setDatasetCreatedSuccessfully] = React.useState(false);
-    const [submissionProgress, setSubmissionProgress] = React.useState(0);
+    const [submissionFolderPath, setSubmissionFolderPath] = React.useState("");
 
     if (main_socket.disconnected) {
         main_socket.connect();
     }
+    main_socket.on("submit_path", submit_path => setSubmissionFolderPath(submit_path));
 
     return (
         <React.Fragment>
@@ -396,23 +396,9 @@ function DatasetView() {
                 <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth>
                     <DialogTitle>Creating Final Dataset</DialogTitle>
                     <DialogContent>
-                        <Box display="flex" alignItems="center">
-                            <Box width="100%" mr={1}>
-                                <LinearProgress variant="determinate" value={submissionProgress} />
-                            </Box>
-                            <Box minWidth={35}>
-                                <Typography variant="body2" color="textSecondary">
-                                    {`${Math.round(submissionProgress)}%`}
-                                </Typography>
-                            </Box>
-                        </Box>
+                        <LinearProgress/>
+                        <Typography variant="body2" color="textSecondary">{submissionFolderPath}</Typography>
                     </DialogContent>
-                    <DialogActions>
-                        <Button autoFocus color="primary" onClick={event => {
-                            event.preventDefault();
-                            setTimeout(() => setMakingSubmissionDataset(false), 5000);
-                        }} disabled={!datasetCreatedSuccessfully}>Open Dataset Folder</Button>
-                    </DialogActions>
                 </Dialog>
             )}
         </React.Fragment>
