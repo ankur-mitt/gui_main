@@ -28,13 +28,14 @@ temp_path = base_path + "Temp"
 @socketio.on("connect")
 def connected_successfully():
     path = os.getcwd()
+
+  
     # prints parent directory
     parent = str(os.path.abspath(os.path.join(path, os.pardir)))
     submit_folder_path = parent+"\\public\\archive\\Submit"
     print(submit_folder_path)
     socketio.emit("submit_path", submit_folder_path)
     print("connected successfully")
-
 # disconnects server
 @socketio.on('disconnect')
 def test_disconnect():
@@ -138,8 +139,28 @@ def csv_data(data):
     for caller in augment_store:
         data_to_send.append(caller(y_true, y_pred))
     print(data_to_send[3])
-    data_to_send = int(data_to_send)
-    socketio.emit("result_array", data_to_send)
+    # data_to_send = int(data_to_send)
+    confusion = []
+    for row in data_to_send[0]:
+        n_row = []
+        for num in row:
+            n_row.append(int(num))
+        confusion.append(n_row)
+    print(confusion)
+    accuracy = int(data_to_send[2])
+    precision = int(data_to_send[3])
+    f_one = int(data_to_send[4])
+    recall = int(data_to_send[5])
+    report = data_to_send[6]
+
+    socketio.emit("result_array", {"confusion":confusion,
+        "accuracy": accuracy,
+        "precision":precision,
+        "f_one":f_one,
+        "recall":recall,
+        "report": report
+    })
+    print("nice")
     
 # images received to apply operations
 @socketio.on("apply_operations")
@@ -273,5 +294,5 @@ if __name__ == '__main__':
     #     # pil_img.save(working_dr+"/"+str(count)+".png", "png")
     #     if modified:
     #         super_paths.append(name)
-    #         processed_data.append(pil_img)
+    #         processed_data.append(pil_img)  
     #     print("images processed no. of imgs "+str(len(processed_data)))
