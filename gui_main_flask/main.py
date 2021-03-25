@@ -139,10 +139,28 @@ def csv_data(data):
     for caller in augment_store:
         data_to_send.append(caller(y_true, y_pred))
     print(data_to_send[3])
-    data_to_send = int(data_to_send)
-    for elem in data_to_send:
-        if elem
-    socketio.emit("result_array", data_to_send)
+    # data_to_send = int(data_to_send)
+    confusion = []
+    for row in data_to_send[0]:
+        n_row = []
+        for num in row:
+            n_row.append(int(num))
+        confusion.append(n_row)
+    print(confusion)
+    accuracy = int(data_to_send[2])
+    precision = int(data_to_send[3])
+    f_one = int(data_to_send[4])
+    recall = int(data_to_send[5])
+    report = data_to_send[6]
+
+    socketio.emit("result_array", {"confusion":confusion,
+        "accuracy": accuracy,
+        "precision":precision,
+        "f_one":f_one,
+        "recall":recall,
+        "report": report
+    })
+    print("nice")
     
 # images received to apply operations
 @socketio.on("apply_operations")
