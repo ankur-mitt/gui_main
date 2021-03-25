@@ -14,7 +14,8 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    LinearProgress
 } from "@material-ui/core";
 import PreviewImagesComponent from "./PreviewImagesComponent";
 import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
@@ -339,6 +340,8 @@ function DatasetView() {
     // setup state variables
     const [tileData, setTileData] = React.useState([]);
     const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
+    const [makingSubmissionDataset, setMakingSubmissionDataset] = React.useState(false);
+    const [datasetCreatedSuccessfully, setDatasetCreatedSuccessfully] = React.useState(false);
 
     if (!main_socket.connected) {
         main_socket.connect();
@@ -394,10 +397,28 @@ function DatasetView() {
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
                             // make the submit folder and populate with original and temp data
-                            main_socket.emit("submit_data");
+                            // main_socket.emit("submit_data");
+                            setSubmitDialogOpen(false);
+                            setMakingSubmissionDataset(true);
                         }}>
                             Confirm
                         </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {makingSubmissionDataset && (
+                <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth={true}>
+                    <DialogTitle>Creating Final Dataset</DialogTitle>
+                    <DialogContent>
+                        {datasetCreatedSuccessfully
+                            ? <LinearProgress variant="determinate" value={100}/>
+                            : <LinearProgress/>}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button autoFocus color="primary" onClick={event => {
+                            event.preventDefault();
+                            setDatasetCreatedSuccessfully(true);
+                        }} disabled={!datasetCreatedSuccessfully}>Train Model</Button>
                     </DialogActions>
                 </Dialog>
             )}
