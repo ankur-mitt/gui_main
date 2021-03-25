@@ -8,6 +8,7 @@ import os
 import shutil
 from pathlib import Path
 from PIL import Image
+import csv
 from augmentation_functions import add_noise, rotate_image, translate, zoom
 from result import labels_Pred, Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
 function_store = [add_noise, rotate_image, translate, zoom]
@@ -112,14 +113,34 @@ def ml_runner(data):
      
 @socketio.on("result_setup")
 def result_master():
-    file_path = ""
+    file_path = "new_file.csv"
     data_to_send = []
     y_pred, y_true = labels_Pred(file_path)
     for caller in augment_store:
         data_to_send.append(caller(y_true, y_pred))
     socketio.emit("result_array", data_to_send)
 
-
+@socketio.on("csv_data")
+def csv_data(data):
+    print("data reading")
+    information = data["data"]
+    file_info = data["fileInfo"]
+    # print(information)
+    # print(file_info)
+    with open("new_file.csv","w+") as my_csv:
+        csvWriter = csv.writer(my_csv,delimiter=',')
+        csvWriter.writerows(information)
+    file_path = "new_file.csv"
+    data_to_send = []
+    y_pred, y_true = labels_Pred(file_path)
+    # print(y_pred)
+    # print("GAAAP")
+    # print(y_true)
+    for caller in augment_store:
+        data_to_send.append(caller(y_true, y_pred))
+    print(data_to_send[3])
+    socketio.emit("result_array", {})
+    
 # images received to apply operations
 @socketio.on("apply_operations")
 def images_received(apply_operations_data):

@@ -23,7 +23,7 @@ def labels_Pred(filename):
           
 
   y_true=y[0]
-  y_pred=y[1]
+  y_pred=y[2]
  
   for i in range(0, len(y_true)): 
         y_true[i] = int(y_true[i])
