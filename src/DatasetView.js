@@ -14,10 +14,17 @@ import {
 } from "@material-ui/core";
 import PreviewImagesComponent from "./PreviewImagesComponent";
 import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@material-ui/icons";
+// imports for backend connection setup
 import {io} from "socket.io-client";
 import {backendURL} from "./backendConfig";
 
-//  function_number is the number of functions or operations that we can apply on the image, like noise, rotate, translate, zoom etc.
+// Starting Main Socket connection it will be restarted if it is disconnected and it is needed
+let main_socket = io(backendURL, {transports: ['websocket'], upgrade: false});
+
+//  function_number is the number of functions or operations that we can apply on the image,
+//  like noise, rotate, translate, zoom etc.
+//  declare global variables
+// default class value is = 0
 let function_number = 4;
 let probability_array = new Array(function_number).fill(0);
 let value_array = new Array(function_number).fill(0);
@@ -27,20 +34,7 @@ for (let i = 0; i <= 44; ++i) {
     masterTile[i.toString()] = [];
 }
 
-// Starting Main Socket connection it will be restarted if it is disconnected and it is needed
-let main_socket = io(backendURL, {transports: ['websocket'], upgrade: false});
-
-async function handleOpenAndReadFiles() {
-    if (!main_socket.connected) {
-        main_socket.connect()
-    }
-    main_socket.emit("file_import", {
-        "class": current_class,
-    });
-    return {data: [], numFiles: []};
-}
-
-function handlePreviewImages() {
+function handleApplyOperations() {
     // manipulation_data is a dictionary as follows
     //  for 1st manipulation data we have these
     //  param_1 : includes value of parameter in the appropriate range, also parameter can be anything even an list
@@ -92,13 +86,9 @@ function ManipulationInputOptions({setTileData}) {
                             value={classValue}
                             onChange={event => {
                                 setClassValue(event.target.value);
-                                console.log(event.target.value);
+                                // console.log(event.target.value);
                                 current_class = event.target.value;
-                                try {
-                                    setTileData(masterTile[current_class.toString()])
-                                } catch (e) {
-                                    console.log("next " + e)
-                                }
+                                setTileData(masterTile[current_class.toString()]);
                             }}
                         >
                             {Array(45).fill(0).map((temp, index) =>
@@ -109,10 +99,12 @@ function ManipulationInputOptions({setTileData}) {
                 </Grid>
                 <Grid item xs={6}>
                     <ButtonGroup variant="outlined" size="small">
-                        <Button title="initiate-single" startIcon={<PlayArrowSharp/>} onClick={() => handleOpenAndReadFiles()}>
+                        <Button title="initiate-single" startIcon={<PlayArrowSharp/>}
+                                onClick={() => main_socket.emit("file_import", {"class": current_class})}>
                             Initiate Class
                         </Button>
-                        <Button title="initiate-all" startIcon={<PlayArrowSharp/>} onClick={() => main_socket.emit("initiate-all")}>
+                        <Button title="initiate-all" startIcon={<PlayArrowSharp/>}
+                                onClick={() => main_socket.emit("initiate-all")}>
                             Initiate All
                         </Button>
                     </ButtonGroup>
@@ -247,24 +239,28 @@ function ManipulationInputOptions({setTileData}) {
     );
 }
 
-function ViewImages(setTileData) {
+// loads the temp folder data,
+// updates tile data with some randomly chosen images,
+// only for the current_class
+function handlePreviewImages(setTileData) {
     if (!main_socket.connected) {
-        main_socket.connect()
+        main_socket.connect();
     }
-    main_socket.emit("view_image", current_class)
+    main_socket.emit("view_image", current_class);
     main_socket.on("view_image", data => {
         // console.log(data);        
         let finalProcessedImagesData = data.map(item => {
             return {
-                src: "archive/Temp/"+current_class.toString()+"/"+item,
+                src: "archive/Temp/" + current_class.toString() + "/" + item,
                 alt: "nothing"
-            }
-            })
+            };
+        });
         // console.log(finalProcessedImagesData)
-        masterTile[current_class.toString()] = finalProcessedImagesData
+        masterTile[current_class.toString()] = finalProcessedImagesData;
         setTileData(finalProcessedImagesData);
-    })
+    });
 }
+
 function AugmentationOptionsComponent({setTileData}) {
     if (!main_socket.connected) {
         main_socket.connect()
@@ -286,8 +282,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                         color="primary"
                                         startIcon={<BrushSharp/>}
                                         onClick={(e) => {
-                                            e.preventDefault()
-                                            handlePreviewImages()
+                                            e.preventDefault();
+                                            handleApplyOperations();
                                         }}
                                     >
                                         Apply Operations
@@ -297,8 +293,9 @@ function AugmentationOptionsComponent({setTileData}) {
                                         color="default"
                                         startIcon={<VisibilitySharp/>}
                                         onClick={(e) => {
-                                            e.preventDefault()
-                                            ViewImages(setTileData)
+                                            e.preventDefault();
+                                            // load the temp data: some images randomly
+                                            handlePreviewImages(setTileData);
                                         }}
                                     >
                                         Preview Images
@@ -312,8 +309,9 @@ function AugmentationOptionsComponent({setTileData}) {
                                     color="secondary"
                                     startIcon={<CloudUploadSharp/>}
                                     onClick={(e) => {
-                                        e.preventDefault()
-                                        main_socket.emit("submit_data")
+                                        e.preventDefault();
+                                        // make the submit folder and populate with original and temp data
+                                        main_socket.emit("submit_data");
                                     }}
                                 >
                                     Submit Dataset
@@ -331,7 +329,7 @@ function DatasetView() {
     // setup state variables
     const [tileData, setTileData] = React.useState([]);
     if (!main_socket.connected) {
-        main_socket.connect()
+        main_socket.connect();
     }
     // register socket events
     main_socket.on("processed_images", processedImagesData => {
@@ -340,12 +338,12 @@ function DatasetView() {
             return {
                 src: "archive/Temp/" + current_class.toString() + "/" + item,
                 alt: item
-            }
+            };
         });
         // console.log(finalProcessedImagesData);
         masterTile[current_class.toString()] = finalProcessedImagesData;
         setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
-        
+
     });
     main_socket.on("load-images", data => {
         if (data === "complete") {
@@ -353,7 +351,7 @@ function DatasetView() {
             setTileData([{
                 src: "logo192.png",
                 alt: "Ready"
-            }])
+            }]);
         }
     });
 
