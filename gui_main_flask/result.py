@@ -1,7 +1,4 @@
 from sklearn.metrics import confusion_matrix
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
@@ -36,7 +33,7 @@ def labels_Pred(filename):
 
 # y_pred, y_true = labels_Pred(filename)
 # print(y_pred,y_true)
-
+"""
 classes = { 0:'Speed limit (20km/h)',
             1:'Speed limit (30km/h)', 
             2:'Speed limit (50km/h)', 
@@ -81,8 +78,9 @@ classes = { 0:'Speed limit (20km/h)',
             41:'End of no passing', 
             42:'End no passing veh > 3.5 tons' 
            }
+"""
 
-def Confusion_Matrix(y_true, y_pred , classes):
+def Confusion_Matrix(y_true, y_pred):
 
   cf = confusion_matrix(y_true, y_pred)
   # df_cm = pd.DataFrame(cf, index = classes,  columns = classes)
@@ -97,14 +95,13 @@ def data_dictonary(y_true, y_pred):
     temp = precision_recall_fscore_support(y_true, y_pred, average=None)
     data_to_return = []
     for i in range(temp[0].shape[0]):
-    data_to_return.append({
-        "class_number": i,
-        "class_name" : classes[i],
-        "precision": temp[0][i],
-        "recall": temp[1][i],
-        "fscore" : temp[2][i],
-        "support" : temp[3][i]
-    })
+      data_to_return.append({
+          "class_number": i,
+          "precision": temp[0][i],
+          "recall": temp[1][i],
+          "fscore" : temp[2][i],
+          "support" : temp[3][i]
+      })
     return data_to_return
 
 
@@ -114,7 +111,7 @@ def Accuracy_score(y_true, y_pred):
 # print(Accuracy_score(y_true, y_pred))
 
 
-def Precssion_score(y_true, y_pred):
+def Precision_score(y_true, y_pred):
   return precision_score(y_true, y_pred, average='macro')
 # print(Precssion_score(y_true, y_pred))
 

@@ -7,8 +7,11 @@ import random
 import os
 import shutil
 from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog
 from PIL import Image
 from augmentation_functions import add_noise, rotate_image, translate, zoom
+# from result import labels_Pred, Confusion, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
 function_store = [add_noise, rotate_image, translate, zoom]
 number_operations = len(function_store)
 app = Flask(__name__)
@@ -54,11 +57,13 @@ def view_master(selected_class):
         socketio.emit("view_image", random.sample(names_modified, 60))
 
 @socketio.on("submit_data")
-def ml_runner():
+def ml_runner(data):
+    splitting_ratio = data["splitting_ratio"]
+    print(splitting_ratio)
     print("entered ml_runner")
     submit_dr = "../public/archive/Submit/"
     shutil.rmtree(submit_dr, ignore_errors=True)
-    os.mkdir(submit_dr)
+    os.mkdir(submit_dr) 
     for selected_class in range(0, 43):
         working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
         train_dr = "../public/archive/Train/"+str(selected_class)+"/"
@@ -68,7 +73,7 @@ def ml_runner():
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
         # progress indication
-        socketio.emit("progress-show", selected_class*100/43)
+        socketio.emit("progress", {"progress": selected_class*100/43})
         path_original = list(map(lambda x : train_dr+str(x), names_original ))
         if os.path.exists(working_dr):
             names_modified = os.listdir(working_dr)
@@ -83,6 +88,14 @@ def ml_runner():
             img = Image.open(path)
             img.save(class_submit+name)
      
+@socketio.on("result_setup")
+def result_master(data):
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename()
+    data_to_send = []
+
+
 
 # images received to apply operations
 @socketio.on("apply_operations")

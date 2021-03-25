@@ -349,6 +349,7 @@ function DatasetView() {
         main_socket.connect();
     }
     // register socket events
+    /*
     main_socket.on("processed_images", processedImagesData => {
         // console.log(processedImagesData);        
         let finalProcessedImagesData = processedImagesData.map(item => {
@@ -364,19 +365,14 @@ function DatasetView() {
     });
     main_socket.on("load-images", data => {
         if (data === "complete") {
-            // console.log("received load-images");
+            console.log("received load-images");
             setTileData([{
                 src: "logo192.png",
                 alt: "Ready"
             }]);
         }
     });
-    main_socket.on("progress", progress => {
-        setSubmissionProgress(progress);
-        if (progress === 100) {
-            setDatasetCreatedSuccessfully(true);
-        }
-    });
+    */
 
     return (
         <React.Fragment>
@@ -409,7 +405,14 @@ function DatasetView() {
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
                             // make the submit folder and populate with original and temp data
-                            // main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
+                            main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
+                            main_socket.on("progress", progress => {
+                                console.log(progress)
+                                setSubmissionProgress(progress["progress"]);
+                                if (progress["progress"] === 100) {
+                                    setDatasetCreatedSuccessfully(true);
+                                }
+                            });
                             setSubmitDialogOpen(false);
                             setMakingSubmissionDataset(true);
                         }}>
