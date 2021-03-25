@@ -332,7 +332,7 @@ function DatasetView() {
         let finalProcessedImagesData = processedImagesData.map(item => {
             return {
                 src: "archive/Temp/" + current_class.toString() + "/" + item,
-                alt: "nothing"
+                alt: item
             }
         });
         // console.log(finalProcessedImagesData);
