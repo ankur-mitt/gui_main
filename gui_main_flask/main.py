@@ -22,7 +22,6 @@ base_path = str(Path(__file__).parent.parent)+"\\public\\archive\\"
 train_path = base_path+"Train"
 temp_path = base_path + "Temp"
 
-
 @socketio.on("connect")
 def connected_successfully():
     print("connected successfully")
@@ -72,8 +71,6 @@ def ml_runner(data):
         class_submit = submit_dr+str(selected_class)+"/"
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
-        # progress indication
-        socketio.emit("progress", {"progress": selected_class*100/43})
         path_original = list(map(lambda x : train_dr+str(x), names_original ))
         if os.path.exists(working_dr):
             names_modified = os.listdir(working_dr)
@@ -94,8 +91,6 @@ def result_master(data):
     root.withdraw()
     file_path = filedialog.askopenfilename()
     data_to_send = []
-
-
 
 # images received to apply operations
 @socketio.on("apply_operations")

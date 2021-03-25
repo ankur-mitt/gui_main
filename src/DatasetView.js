@@ -345,34 +345,9 @@ function DatasetView() {
     const [datasetCreatedSuccessfully, setDatasetCreatedSuccessfully] = React.useState(false);
     const [submissionProgress, setSubmissionProgress] = React.useState(0);
 
-    if (!main_socket.connected) {
+    if (main_socket.disconnected) {
         main_socket.connect();
     }
-    // register socket events
-    /*
-    main_socket.on("processed_images", processedImagesData => {
-        // console.log(processedImagesData);        
-        let finalProcessedImagesData = processedImagesData.map(item => {
-            return {
-                src: "archive/Temp/" + current_class.toString() + "/" + item,
-                alt: item
-            };
-        });
-        // console.log(finalProcessedImagesData);
-        masterTile[current_class.toString()] = finalProcessedImagesData;
-        setTileData(finalProcessedImagesData);  // update the component state with new 'tileData'
-
-    });
-    main_socket.on("load-images", data => {
-        if (data === "complete") {
-            console.log("received load-images");
-            setTileData([{
-                src: "logo192.png",
-                alt: "Ready"
-            }]);
-        }
-    });
-    */
 
     return (
         <React.Fragment>
@@ -404,15 +379,11 @@ function DatasetView() {
                     <DialogActions>
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
+                            if (main_socket.disconnected) {
+                                main_socket.connect();
+                            }
                             // make the submit folder and populate with original and temp data
                             main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
-                            main_socket.on("progress", progress => {
-                                console.log(progress)
-                                setSubmissionProgress(progress["progress"]);
-                                if (progress["progress"] === 100) {
-                                    setDatasetCreatedSuccessfully(true);
-                                }
-                            });
                             setSubmitDialogOpen(false);
                             setMakingSubmissionDataset(true);
                         }}>
@@ -439,7 +410,6 @@ function DatasetView() {
                     <DialogActions>
                         <Button autoFocus color="primary" onClick={event => {
                             event.preventDefault();
-                            main_socket.emit("open_submit_folder");
                             setTimeout(() => setMakingSubmissionDataset(false), 5000);
                         }} disabled={!datasetCreatedSuccessfully}>Open Dataset Folder</Button>
                     </DialogActions>
