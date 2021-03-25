@@ -24,6 +24,14 @@ temp_path = base_path + "Temp"
 
 @socketio.on("connect")
 def connected_successfully():
+    path = os.getcwd()
+
+  
+    # prints parent directory
+    parent = str(os.path.abspath(os.path.join(path, os.pardir)))
+    submit_folder_path = parent+"\\public\\archive\\Submit"
+    print(submit_folder_path)
+    socketio.emit("submit_path", submit_folder_path)
     print("connected successfully")
 
 @socketio.on('disconnect')
@@ -72,12 +80,11 @@ def ml_runner(data):
         train_dr = "../public/archive/Train/"+str(selected_class)+"/"
         final_name = []
         final_paths = []
-        randn_number = random.uniform(0, 1)
+        
         class_submit = ""
-        if randn_number<splitting_ratio:
-            class_submit = submit_valid+str(selected_class)+"/"
-        else :
-            class_submit = submit_train+str(selected_class)+"/"
+        os.mkdir(submit_valid+str(selected_class)+"/")
+        os.mkdir(submit_train+str(selected_class)+"/")
+        
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
         # progress indication
@@ -91,8 +98,13 @@ def ml_runner(data):
         else:
             final_name = names_original
             final_paths = path_original
-        os.mkdir(class_submit)
+        
         for path, name in zip(final_paths, final_name):
+            randn_number = random.uniform(0, 1)
+            if randn_number<splitting_ratio:
+                class_submit = submit_valid+str(selected_class)+"/"
+            else :
+                class_submit = submit_train+str(selected_class)+"/"
             img = Image.open(path)
             img.save(class_submit+name)
      
