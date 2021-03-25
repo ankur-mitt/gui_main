@@ -32,3 +32,7 @@
 7. This Operation takes about 3-4 minutes to compile.
 
 # To Use Results Operations
+1. CSV file to be upload: frist row-> true labels, second row-> predicted labels
+2. Result page displays (a) Confusion matrix: x-axis:true class and y-axis:predicted class
+                        (b) Donut chart displaying percentage of different classes in actual and predicted dataset.
+                        (c) Radar chart displaying average(macro) accuracy score, precision score, F1 score, recall score.

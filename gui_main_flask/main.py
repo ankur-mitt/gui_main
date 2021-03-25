@@ -160,6 +160,7 @@ def csv_data(data):
         "recall":recall,
         "report": report
     })
+    print(report)
     print("nice")
     
 # images received to apply operations
