@@ -28,14 +28,13 @@ temp_path = base_path + "Temp"
 @socketio.on("connect")
 def connected_successfully():
     path = os.getcwd()
-
-  
     # prints parent directory
     parent = str(os.path.abspath(os.path.join(path, os.pardir)))
     submit_folder_path = parent+"\\public\\archive\\Submit"
     print(submit_folder_path)
     socketio.emit("submit_path", submit_folder_path)
     print("connected successfully")
+
 # disconnects server
 @socketio.on('disconnect')
 def test_disconnect():
@@ -140,8 +139,6 @@ def csv_data(data):
         data_to_send.append(caller(y_true, y_pred))
     print(data_to_send[3])
     data_to_send = int(data_to_send)
-    for elem in data_to_send:
-        if elem
     socketio.emit("result_array", data_to_send)
     
 # images received to apply operations
@@ -276,5 +273,5 @@ if __name__ == '__main__':
     #     # pil_img.save(working_dr+"/"+str(count)+".png", "png")
     #     if modified:
     #         super_paths.append(name)
-    #         processed_data.append(pil_img)  
+    #         processed_data.append(pil_img)
     #     print("images processed no. of imgs "+str(len(processed_data)))

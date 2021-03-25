@@ -20,14 +20,18 @@ def labels_Pred(filename):
       for row in csv_reader:
           # row variable is a list that represents a row in csv
           y.append(row)
-          
 
-  y_true=y[0]
-  y_pred=y[2]
+
+  y_true={}
+  y_pred={}
  
-  for i in range(0, len(y_true)): 
-        y_true[i] = int(y_true[i])
-        y_pred[i] = int(y_pred[i])
+  for i in range(0, len(y[0])):
+        if y[0][i] == '':
+            continue
+        if y[2][i] == '':
+            continue
+        y_true[i] = int(y[0][i])
+        y_pred[i] = int(y[2][i])
   
   return y_pred, y_true
 
