@@ -14,6 +14,8 @@ function_store = [add_noise, rotate_image, translate, zoom]
 augment_store = [Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report]
 number_operations = len(function_store)
 app = Flask(__name__)
+# number of classes (not final class number)
+num_classes = 48 
 # enable cors
 socketio = SocketIO(app, cors_allowed_origins="*", ping_timeout=300, ping_interval=30)  # allow all origins
 
@@ -21,7 +23,7 @@ base_path = str(Path(__file__).parent.parent)+"\\public\\archive\\"
 train_path = base_path+"Train"
 temp_path = base_path + "Temp"
 
-
+# socket connects
 @socketio.on("connect")
 def connected_successfully():
     path = os.getcwd()
@@ -33,7 +35,7 @@ def connected_successfully():
     print(submit_folder_path)
     socketio.emit("submit_path", submit_folder_path)
     print("connected successfully")
-
+# disconnects server
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected: ')
@@ -48,7 +50,7 @@ def first_time_setup(data):
 
 @socketio.on("initiate-all")
 def initiate_all():
-    for selected_class in range(0, 43):
+    for selected_class in range(0, num_classes):
         temp_path = "../public/archive/Temp/"+str(selected_class)+"/"
         shutil.rmtree(temp_path, ignore_errors=True)
         os.mkdir(temp_path)
@@ -75,7 +77,7 @@ def ml_runner(data):
     submit_valid = submit_dr+"validation/"
     os.mkdir(submit_train)
     os.mkdir(submit_valid)
-    for selected_class in range(0, 43):
+    for selected_class in range(0, num_classes):
         working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
         train_dr = "../public/archive/Train/"+str(selected_class)+"/"
         final_name = []

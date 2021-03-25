@@ -22,7 +22,8 @@ import {PlayArrowSharp, BrushSharp, VisibilitySharp, CloudUploadSharp} from "@ma
 // imports for backend connection setup
 import {io} from "socket.io-client";
 import {backendURL} from "./backendConfig";
-
+// number of classes (not number of final class)
+let num_classes = 48
 // Starting Main Socket connection it will be restarted if it is disconnected and it is needed
 let main_socket = io(backendURL, {transports: ['websocket'], upgrade: false});
 
@@ -35,7 +36,7 @@ let probability_array = new Array(function_number).fill(0);
 let value_array = new Array(function_number).fill(0);
 let current_class = 0;
 let masterTile = {};
-for (let i = 0; i <= 44; ++i) {
+for (let i = 0; i < num_classes; ++i) {
     masterTile[i.toString()] = [];
 }
 let splitting_ratio = 0.3;
@@ -97,7 +98,7 @@ function ManipulationInputOptions({setTileData}) {
                                 setTileData(masterTile[current_class.toString()]);
                             }}
                         >
-                            {Array(45).fill(0).map((temp, index) =>
+                            {Array(num_classes).fill(0).map((temp, index) =>
                                 <MenuItem value={index} key={index}>{index}</MenuItem>
                             )}
                         </Select>
