@@ -285,7 +285,10 @@ function AugmentationOptionsComponent({setTileData}) {
                                         title="apply-images"
                                         color="primary"
                                         startIcon={<BrushSharp/>}
-                                        onClick={() => handlePreviewImages()}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            handlePreviewImages()
+                                        }}
                                     >
                                         Apply Operations
                                     </Button>
@@ -293,7 +296,10 @@ function AugmentationOptionsComponent({setTileData}) {
                                         title="preview-images"
                                         color="default"
                                         startIcon={<VisibilitySharp/>}
-                                        onClick={() => ViewImages(setTileData)}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            ViewImages(setTileData)
+                                        }}
                                     >
                                         Preview Images
                                     </Button>
@@ -305,7 +311,8 @@ function AugmentationOptionsComponent({setTileData}) {
                                     variant="contained"
                                     color="secondary"
                                     startIcon={<CloudUploadSharp/>}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault()
                                         main_socket.emit("submit_data")
                                     }}
                                 >

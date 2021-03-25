@@ -13,7 +13,7 @@ function_store = [add_noise, rotate_image, translate, zoom]
 number_operations = len(function_store)
 app = Flask(__name__)
 # enable cors
-socketio = SocketIO(app, cors_allowed_origins="*")  # allow all origins
+socketio = SocketIO(app, cors_allowed_origins="*", ping_timeout=300, ping_interval=30)  # allow all origins
 
 base_path = str(Path(__file__).parent.parent)+"\\public\\archive\\"
 train_path = base_path+"Train"
