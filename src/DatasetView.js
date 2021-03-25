@@ -344,6 +344,7 @@ function DatasetView() {
     const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
     const [makingSubmissionDataset, setMakingSubmissionDataset] = React.useState(false);
     const [submissionFolderPath, setSubmissionFolderPath] = React.useState("");
+    const [showLinearProgress, setShowLinerProgress] = React.useState(true);
 
     if (main_socket.disconnected) {
         main_socket.connect();
@@ -387,6 +388,7 @@ function DatasetView() {
                             main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
                             setSubmitDialogOpen(false);
                             setMakingSubmissionDataset(true);
+                            setTimeout(() => setShowLinerProgress(false), 10000);
                         }}>
                             Confirm
                         </Button>
@@ -394,11 +396,15 @@ function DatasetView() {
                 </Dialog>
             )}
             {makingSubmissionDataset && (
-                <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth>
+                <Dialog open={makingSubmissionDataset} maxWidth="sm" fullWidth onClose={() =>
+                    setMakingSubmissionDataset(false)
+                }>
                     <DialogTitle>Creating Final Dataset</DialogTitle>
                     <DialogContent>
-                        <LinearProgress/>
-                        <Typography variant="body2" color="textSecondary">{submissionFolderPath}</Typography>
+                        {showLinearProgress && <LinearProgress/>}
+                        <Typography variant="body2" color="textSecondary" style={{paddingTop: "1rem"}}>
+                            {"Your dataset is being created at:\n"+submissionFolderPath.toString()}
+                        </Typography>
                     </DialogContent>
                 </Dialog>
             )}
