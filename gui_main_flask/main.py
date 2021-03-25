@@ -63,12 +63,21 @@ def ml_runner(data):
     submit_dr = "../public/archive/Submit/"
     shutil.rmtree(submit_dr, ignore_errors=True)
     os.mkdir(submit_dr) 
+    submit_train = submit_dr+"train/"
+    submit_valid = submit_dr+"validation/"
+    os.mkdir(submit_train)
+    os.mkdir(submit_valid)
     for selected_class in range(0, 43):
         working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
         train_dr = "../public/archive/Train/"+str(selected_class)+"/"
         final_name = []
         final_paths = []
-        class_submit = submit_dr+str(selected_class)+"/"
+        randn_number = random.uniform(0, 1)
+        class_submit = ""
+        if randn_number<splitting_ratio:
+            class_submit = submit_valid+str(selected_class)+"/"
+        else :
+            class_submit = submit_train+str(selected_class)+"/"
         print("entering class "+str(selected_class))
         names_original = os.listdir(train_dr)
         # progress indication
@@ -89,6 +98,7 @@ def ml_runner(data):
      
 @socketio.on("result_setup")
 def result_master():
+    file_path = ""
     data_to_send = []
     y_pred, y_true = labels_Pred(file_path)
     for caller in augment_store:
