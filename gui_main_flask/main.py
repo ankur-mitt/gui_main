@@ -152,6 +152,7 @@ def csv_data(data):
     report = data_to_send[6]
 
     socketio.emit("result_array", {"confusion":confusion,
+        "data_dictionary": data_to_send[1],
         "accuracy": accuracy,
         "precision":precision,
         "f_one":f_one,

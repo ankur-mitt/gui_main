@@ -30,6 +30,7 @@ def labels_Pred(filename):
   
   return y_pred, y_true
 
+
 # y_pred, y_true = labels_Pred(filename)
 # print(y_pred,y_true)
 """
@@ -92,15 +93,19 @@ def Confusion_Matrix(y_true, y_pred):
 def data_dictionary(y_true, y_pred):
 
     temp = precision_recall_fscore_support(y_true, y_pred, average=None)
-    data_to_return = []
+    data_to_return = {
+      "class_number": [],
+      "precision": [],
+      "recall": [],
+      "fscore": [],
+      "support": []
+    }
     for i in range(temp[0].shape[0]):
-      data_to_return.append({
-          "class_number": i,
-          "precision": temp[0][i],
-          "recall": temp[1][i],
-          "fscore" : temp[2][i],
-          "support" : temp[3][i]
-      })
+      data_to_return["class_number"].append(int(i))
+      data_to_return["precision"].append(float(temp[0][i]))
+      data_to_return["recall"].append(float(temp[1][i]))
+      data_to_return["fscore"].append(float(temp[2][i]))
+      data_to_return["support"].append(int(temp[3][i]))
     return data_to_return
 
 
