@@ -27,9 +27,7 @@ temp_path = base_path + "Temp"
 # socket connects
 @socketio.on("connect")
 def connected_successfully():
-    path = os.getcwd()
-
-  
+    path = os.getcwd() 
     # prints parent directory
     parent = str(os.path.abspath(os.path.join(path, os.pardir)))
     submit_folder_path = parent+"\\public\\archive\\Submit"
@@ -138,10 +136,10 @@ def csv_data(data):
     # print(y_true)
     for caller in augment_store:
         data_to_send.append(caller(y_true, y_pred))
-    print(data_to_send[3])
+    print(data_to_send[0])
     # data_to_send = int(data_to_send)
     confusion = []
-    for row in data_to_send[0]:
+    for row in Confusion_Matrix(y_true, y_pred):
         n_row = []
         for num in row:
             n_row.append(int(num))

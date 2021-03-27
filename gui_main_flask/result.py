@@ -8,8 +8,6 @@ from sklearn.metrics import classification_report
 
 from csv import reader
 # open file in read mode
-filename="your_file.csv"
-
 
 def labels_Pred(filename):
   y=[]
@@ -22,8 +20,8 @@ def labels_Pred(filename):
           y.append(row)
 
 
-  y_true={}
-  y_pred={}
+  y_true=y[0]
+  y_pred=y[2]
  
   for i in range(0, len(y[0])):
         if y[0][i] == '':
