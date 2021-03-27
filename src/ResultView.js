@@ -43,7 +43,7 @@ function ResultView() {
         precisionScore = data["precision"];
         f1Score = data["f_one"];
         recallScore = data["recall"];
-        console.log("data received");
+        console.log("data received: ", data);
     });
 
     return (

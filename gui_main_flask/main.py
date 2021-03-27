@@ -145,10 +145,10 @@ def csv_data(data):
             n_row.append(int(num))
         confusion.append(n_row)
     print(confusion)
-    accuracy = int(data_to_send[2])
-    precision = int(data_to_send[3])
-    f_one = int(data_to_send[4])
-    recall = int(data_to_send[5])
+    accuracy = (data_to_send[2])
+    precision = (data_to_send[3])
+    f_one = (data_to_send[4])
+    recall = (data_to_send[5])
     report = data_to_send[6]
 
     socketio.emit("result_array", {"confusion":confusion,
