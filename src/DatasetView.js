@@ -388,7 +388,7 @@ function DatasetView() {
                             main_socket.emit("submit_data", {"splitting_ratio": splitting_ratio});
                             setSubmitDialogOpen(false);
                             setMakingSubmissionDataset(true);
-                            setTimeout(() => setShowLinerProgress(false), 10000);
+                            setTimeout(() => setShowLinerProgress(false), 30000);
                         }}>
                             Confirm
                         </Button>

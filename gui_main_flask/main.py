@@ -9,6 +9,7 @@ import shutil
 from pathlib import Path
 from PIL import Image
 import csv
+import threading, time
 from augmentation_functions import add_noise, rotate_image, translate, zoom
 from result import labels_Pred, Confusion_Matrix, data_dictionary, Accuracy_score, Precision_score, F1_score, Recall_score, report
 function_store = [add_noise, rotate_image, translate, zoom]
@@ -64,8 +65,45 @@ def view_master(selected_class):
     else:
         socketio.emit("view_image", random.sample(names_modified, 60))
 
+def submit_data_maker(selected_class, submit_train, submit_valid, splitting_ratio):
+            working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
+            train_dr = "../public/archive/Train/"+str(selected_class)+"/"
+            final_name = []
+            final_paths = []
+
+            class_submit = ""
+            os.mkdir(submit_valid+str(selected_class)+"/")
+            os.mkdir(submit_train+str(selected_class)+"/")
+
+            print("entering class "+str(selected_class))
+            names_original = os.listdir(train_dr)
+            # progress indication
+            # socketio.emit("progress", {"progress": selected_class*100/43})
+            path_original = list(map(lambda x : train_dr+str(x), names_original ))
+            if os.path.exists(working_dr):
+                names_modified = os.listdir(working_dr)
+                path_modified = list(map(lambda x : working_dr+str(x), names_modified ))
+                final_paths = path_modified+path_original
+                final_name = names_modified+names_original
+            else:
+                final_name = names_original
+                final_paths = path_original
+
+            for path, name in zip(final_paths, final_name):
+                random_number = random.uniform(0, 1)
+                if random_number<splitting_ratio:
+                    class_submit = submit_valid+str(selected_class)+"/"
+                else :
+                    class_submit = submit_train+str(selected_class)+"/"
+                img = Image.open(path)
+                img.save(class_submit+name)
+
+            print("exiting class "+str(selected_class))
+
 @socketio.on("submit_data")
 def ml_runner(data):
+    start_time = time.time()
+
     splitting_ratio = data["splitting_ratio"]
     print(splitting_ratio)
     print("entered ml_runner")
@@ -76,39 +114,17 @@ def ml_runner(data):
     submit_valid = submit_dr+"validation/"
     os.mkdir(submit_train)
     os.mkdir(submit_valid)
+    threads = []
     for selected_class in range(0, num_classes):
-        working_dr = "../public/archive/Temp/"+str(selected_class)+"/"
-        train_dr = "../public/archive/Train/"+str(selected_class)+"/"
-        final_name = []
-        final_paths = []
-        
-        class_submit = ""
-        os.mkdir(submit_valid+str(selected_class)+"/")
-        os.mkdir(submit_train+str(selected_class)+"/")
-        
-        print("entering class "+str(selected_class))
-        names_original = os.listdir(train_dr)
-        # progress indication
-        socketio.emit("progress", {"progress": selected_class*100/43})
-        path_original = list(map(lambda x : train_dr+str(x), names_original ))
-        if os.path.exists(working_dr):
-            names_modified = os.listdir(working_dr)
-            path_modified = list(map(lambda x : working_dr+str(x), names_modified ))
-            final_paths = path_modified+path_original
-            final_name = names_modified+names_original
-        else:
-            final_name = names_original
-            final_paths = path_original
-        
-        for path, name in zip(final_paths, final_name):
-            randn_number = random.uniform(0, 1)
-            if randn_number<splitting_ratio:
-                class_submit = submit_valid+str(selected_class)+"/"
-            else :
-                class_submit = submit_train+str(selected_class)+"/"
-            img = Image.open(path)
-            img.save(class_submit+name)
-     
+        t = threading.Thread(target=submit_data_maker, args=(selected_class, submit_train, submit_valid, splitting_ratio,))
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+
+    elapsed_time = time.time() - start_time
+    print("total time taken: " + str(elapsed_time) + " second(s)")
+
 @socketio.on("result_setup")
 def result_master():
     file_path = "new_file.csv"
@@ -157,7 +173,7 @@ def csv_data(data):
         "precision":precision,
         "f_one":f_one,
         "recall":recall,
-        # "report": report
+        "report": report
     })
     print(report)
     print("nice")
