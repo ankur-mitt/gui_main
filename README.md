@@ -3,24 +3,24 @@
 **Screenshots of the working application**
 <table>
     <tr>
-        <td><img src="/screenshots/screenshot (1).png" alt="1" style="display: block; margin: auto;"></td>
-        <td><img src="/screenshots/screenshot (2).png" alt="2" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (1).png" alt="1" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (2).png" alt="2" style="display: block; margin: auto;"></td>
     </tr>
     <tr>
-        <td><img src="/screenshots/screenshot (3).png" alt="3" style="display: block; margin: auto;"></td>
-        <td><img src="/screenshots/screenshot (4).png" alt="4" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (3).png" alt="3" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (4).png" alt="4" style="display: block; margin: auto;"></td>
     </tr>
     <tr>
-        <td><img src="/screenshots/screenshot (5).png" alt="5" style="display: block; margin: auto;"></td>
-        <td><img src="/screenshots/screenshot (6).png" alt="6" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (5).png" alt="5" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (6).png" alt="6" style="display: block; margin: auto;"></td>
     </tr>
     <tr>
-        <td><img src="/screenshots/screenshot (7).png" alt="7" style="display: block; margin: auto;"></td>
-        <td><img src="/screenshots/screenshot (8).png" alt="8" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (7).png" alt="7" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (8).png" alt="8" style="display: block; margin: auto;"></td>
     </tr>
     <tr>
-        <td><img src="/screenshots/screenshot (9).png" alt="9" style="display: block; margin: auto;"></td>
-        <td><img src="/screenshots/screenshot (10).png" alt="10" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (9).png" alt="9" style="display: block; margin: auto;"></td>
+        <td><img src="/screenshots/Screenshot (10).png" alt="10" style="display: block; margin: auto;"></td>
     </tr>
 </table>
 
